@@ -1,0 +1,106 @@
+---
+title: "EML-basic-test"
+author: "Ivan C Hanigan"
+date: "13/07/2014"
+output: html_document
+---
+
+Writing R data into EML
+-----------------------
+
+
+`EML` now extends R's `data.frame` class by introducing the `data.set`
+class which includes additional metadata required by EML.  A `data.set`
+can be created much like a `data.frame` by specifying additional arguments
+
+```{r}
+require(EML)
+```
+
+```{r}
+dat = data.set(river = c("SAC",  "SAC",   "AM"),
+               spp   = c("king",  "king", "ccho"),
+               stg   = c("smolt", "parr", "smolt"),
+               ct    = c(293L,    410L,    210L),
+               col.defs = c("River site used for collection",
+                            "Species common name",
+                            "Life Stage",
+                            "count of live fish in traps"),
+               unit.defs = list(c(SAC = "The Sacramento River",
+                                  AM = "The American River"),
+                                c(king = "King Salmon",
+                                  ccho = "Coho Salmon"),
+                                c(parr = "third life stage",
+                                  smolt = "fourth life stage"),
+                                "number"))
+
+```
+
+
+- `col.defs`: These are usually just plain text definitions, though a
+  URI to a semantic definition can be particularly powerful. See "Advanced
+  Use" for details on adding richer information, such as the method used to
+  collect the data or set the geographic, taxanomic, or temporal coverage
+  of an individual column.
+
+- `unit.defs`:   For factors, this is a definition of
+  the levels involved.  For numeric data, specify the units from [this
+  list](http://knb.ecoinformatics.org/software/eml/eml-2.1.1/eml-unitTypeDefinitions.html#StandardUnitDictionary).
+  For dates, specify the format, (e.g. YYYY or MM-DD-YY). For character
+  strings, a definition of the kind of string can be given, (e.g. species
+  scientific name), otherwise the column description will be used.
+
+Alternatively, annotations can be added to an existing data frame,
+`data.set(my.data.frame, col.defs = ..., unit.defs = ...)`.
+
+
+We will also specify a default creator who will also be used as the
+contact person for EML files created in this session.
+
+
+```{r}
+eml_config(creator="Carl Boettiger <cboettig@gmail.com>")
+```
+
+
+While we will always be able to provide alternative or additional creators
+or contact person later, `eml_config` can store the defaults to save
+us the trouble of entering this data repeatedly.  See `?eml_config`
+for more information and other configurable defaults.
+
+
+With this information in place, we have all the required metadata to
+generate a minimally valid EML file documenting this dataset.
+
+
+
+```{r}
+eml_write(dat, file = "EML_example.xml")
+```
+
+```
+[1] "EML_example.xml"
+```
+
+
+*for convenience, had we ommitted any essential metadata, such as
+providing only an unannotated `data.frame` in place of a `data.set`,
+`EML` will launch its metadata wizard to assist in constructing the
+metadata based on the data.frame provided*.  While this may be helpful
+starting out, regular users will find it faster to define the columns
+and units directly in the format above.
+
+See the [EML
+generated](https://github.com/ropensci/EML/tree/master/inst/doc/EML_example.xml)
+by this example.
+
+
+We can validate the resulting document to check that no required
+fields are missing and that no entry has been incorrectly formatted.
+This ensures that other software can correctly parse and interpret the
+metadata document:
+
+
+```{r}
+eml_validate("EML_example.xml") 
+```
