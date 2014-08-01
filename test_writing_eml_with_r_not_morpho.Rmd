@@ -77,6 +77,10 @@ We begin by reading in the CSV file providing the raw data that is to be annotat
 ```{r}
 f <- eml_read("knb-lter-hfr.205.4")
 dat <- eml_get(f, "data.frame")
+str(dat)
+head(dat)
+tail(dat)
+# year and day look like full dates.
 ```
 
 As in our [Basic tutorial](), essential metadata describes the columns and units used in the CSV file.  
@@ -361,19 +365,20 @@ The helper function `eml` provides a shortcut to this step-by-step construction 
 
 
 ```{r}
-eml     <- eml( dataset = dat,
-                title = title,
-                creator = creator,
-                contact = contact,
-                pubDate = pubDate,
-                associatedParty = other_researchers,
-                intellectualRights = rights,
-                abstract = abstract,
-                keywordSet = keys,
-                coverage = coverage,
-                methods = method,
-                additionalMetadata = additionalMetadata
-              )
+# is this broken?
+# eml     <- eml( dataset = dat,
+#                 title = title,
+#                 creator = creator,
+#                 contact = contact,
+#                 pubDate = pubDate,
+#                 associatedParty = other_researchers,
+#                 intellectualRights = rights,
+#                 abstract = abstract,
+#                 keywordSet = keys,
+#                 coverage = coverage,
+#                 methods = method,
+#                 additionalMetadata = additionalMetadata
+#               )
 ```
 
 The helper function handles certain steps automatically, such as the creation of a `uuid` for the package identifier.  The required fields `creator` and `contact` will use values set by `eml_config` or can take text strings or R `person` objects as arguments, as well as eml's `creator` or `contact` classes.  In this case we pass a `dataTable` (permitting additional customization we used above such as the description field).  Alternatively this could be an already constructed EML `dataset` or `dataTable` class. 
