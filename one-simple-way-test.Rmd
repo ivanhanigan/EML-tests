@@ -106,7 +106,8 @@ a title, and even choose where to publish:
 ```{r}
 eml1 <- eml_write(dat_with_metadata,
           contact = "Carl Boettiger <cboettig@ropensci.org>",  
-          title = "A test EML file")
+          title = "A test EML file", 
+          file = "test1.xml")
 ```
 
 Just like that, we have accomplished all nine steps, and more besides.
