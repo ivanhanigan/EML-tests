@@ -140,17 +140,7 @@ dataTable <- eml_dataTable(dat,
 
 CSV file conventions can differ across platforms and continents. To remove any ambiguity, EML explicitly describes how the csv file is constructed (noting that it is actually comma delimited as the name implies and not tab delimited, and noting other details such as the number of rows, the character used to indicate and end of a row, and so forth).  Because R is writing the csv file itself after all, it already knows all of these details and we are able to automatically fill out this section of the metadata.  This information is summarized in the `dataTable@physical` element.  
 
-```{r}
-slotNames(dataTable)
-slotNames(dataTable@physical)
-dataTable@physical@objectName
-slotNames(dataTable@physical@distribution)
-dataTable@physical@distribution@online@url <- "ecogrid"
-dataTable@physical@distribution@online@url
-str(dataTable)
-eml_config(creator="Carl Boettiger <cboettig@gmail.com>")
-eml_write(dataTable, file = "EML_example2.xml")
-```
+
 
 
 One of the primary benefits in constructing EML in a scripted language such as R rather than in a GUI interface such as `morpho` is the ability to easily save and reuse components.  Here is an EML component that Harvard Forest will use a lot: it's address
