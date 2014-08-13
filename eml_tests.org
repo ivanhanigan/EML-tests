@@ -1,0 +1,40 @@
+#+TITLE:test EML package 
+#+AUTHOR: Ivan Hanigan
+#+email: ivan.hanigan@anu.edu.au
+#+LaTeX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [a4paper]
+#+LATEX: \tableofcontents
+-----
+
+* R code
+*** COMMENT r_code-code
+#+name:r_code
+#+begin_src R :session *R* :tangle no :exports none :eval no
+  #### name:r_code####
+  library(EML)
+  library(disentangle)
+  require(gdata)
+  ## ------------------------------------------------------------------------
+  dir()
+  metadat <- read.xls("ltern_data_deposit_form_testing.xlsx", sheet= 1, stringsAsFactor=F)
+  persons <- read.xls("ltern_data_deposit_form_testing.xlsx", sheet= 2, stringsAsFactor=F, skip = 2)
+  #"cwt_data_subm_template_2013_testing.xls", sheet= 1)
+  str(metadat)
+  names(metadat)
+  str(persons)
+  
+  #title <- "Thresholds and Tipping Points in a Sarracenia
+  #           Microecosystem at Harvard Forest since 2012"
+  
+  title <- metadat[metadat$EML.shortname == 'title', "Definition"]
+  #title
+  # creator <- c(as("Aaron Ellison", "creator"), as("Nicholas Gotelli", "creator"))
+  creators <- persons[persons$Role == 'creator', "Name"]
+  creators
+  creator <- c(as(creators[1], "creator"))
+  creator <- new("contact", as(creators[2], "creator")
+                 )
+  str(creator)
+  creator
+  cat(paste('c(as("', creators, '", "creator")', sep = "", collapase = ","))
+#+end_src

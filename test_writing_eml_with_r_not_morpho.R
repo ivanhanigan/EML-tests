@@ -1,23 +1,43 @@
 
-## ----include=FALSE, cache=FALSE------------------------------------------
-library(knitr)
-library(devtools)
-opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, cache=1, 
-               comment=NA, verbose=TRUE, fig.width=6, fig.height=4)
-opts_chunk$set(fig.path = paste("figure/",
-                                gsub(".Rmd", "", knitr:::knit_concord$get('infile')),
-                                "-", sep=""),
-               cache.path = paste("cache/", 
-                                  gsub(".Rmd", "", knitr:::knit_concord$get('infile') ), 
-                                "/", sep=""))
- 
+## ----include=FALSE,
+## ----cache=FALSE------------------------------------------
+
+#library(knitr)
+#library(devtools)
+## opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, cache=1,
+##                comment=NA, verbose=TRUE, fig.width=6, fig.height=4)
+## opts_chunk$set(fig.path = paste("figure/",
+##                                 gsub(".Rmd", "", knitr:::knit_concord$get('infile')),
+##                                 "-", sep=""),
+##                cache.path = paste("cache/",
+##                                   gsub(".Rmd", "", knitr:::knit_concord$get('infile') ),
+##                                 "/", sep=""))
 
 
-## ------------------------------------------------------------------------
-library(EML)
-library(disentangle)
 
 ## ------------------------------------------------------------------------
+## library(EML)
+## library(disentangle)
+## require(gdata)
+## ## ------------------------------------------------------------------------
+## dir()
+## metadat <- read.xls("ltern_data_deposit_form_testing.xlsx", sheet= 1, stringsAsFactor=F)
+## #"cwt_data_subm_template_2013_testing.xls", sheet= 1)
+## str(metadat)
+## names(metadat)
+## #title <- "Thresholds and Tipping Points in a Sarracenia
+## #           Microecosystem at Harvard Forest since 2012"
+
+## title <- metadat[metadat$EML.shortname == 'title', "Definition"]
+## #title
+
+
+
+
+
+
+
+
 f <- eml_read("knb-lter-hfr.205.4")
 dat <- eml_get(f, "data.frame")
 str(dat)
@@ -44,14 +64,14 @@ col.defs <- c("run.num" = "which run number (=block). Range: 1 - 6. (integer)",
               "value.i" = "value of measured variable for run.num on year/day/hour.min.")
 
 ## ------------------------------------------------------------------------
-unit.defs = list("which run number", 
+unit.defs = list("which run number",
                  "YYYY",
                  "DDD",
-                 "hhmm", 
+                 "hhmm",
                  c(R = "real", I = "interpolated", B = "bad"),
-                 c(control = "no prey added", 
+                 c(control = "no prey added",
                    low = "0.125 mg prey added ml-1 d-1",
-                   med.low = "0,25 mg prey added ml-1 d-1",    # ERROR 
+                   med.low = "0,25 mg prey added ml-1 d-1",    # ERROR
                    med.high = "0.5 mg prey added ml-1 d-1",
                    high = "1.0 mg prey added ml-1 d-1",
                    air.temp = "air temperature measured just above all plants (1 thermocouple)",
@@ -64,7 +84,7 @@ unit.defs = list("which run number",
 dataTable <- eml_dataTable(dat,
                            col.defs = col.defs,
                            unit.defs = unit.defs,
-                           description = "Metadata documentation for S1.csv", 
+                           description = "Metadata documentation for S1.csv",
                            filename = "S1.csv")
 
 
@@ -87,16 +107,16 @@ slotNames(eml1)
 slotNames(eml1@dataset@distribution@online)
 eml1@dataset@distribution@online
 ## ------------------------------------------------------------------------
-HF_address <- new("address", 
+HF_address <- new("address",
                   deliveryPoint = "324 North Main Street",
                   city = "Petersham",
                   administrativeArea = "MA",
                   postalCode = "01366",
-                  country = "USA") 
+                  country = "USA")
 
 
 ## ------------------------------------------------------------------------
-publisher <- new("publisher", 
+publisher <- new("publisher",
     organizationName = "Harvard Forest",
     address = HF_address)
 
@@ -117,14 +137,12 @@ contact@phone = "000-000-0000"
 
 
 ## ------------------------------------------------------------------------
-other_researchers <- eml_person("Benjamin Baiser [ctb]", 
-                                "Jennifer Sirota [ctb]") 
+## other_researchers <- eml_person("Benjamin Baiser [ctb]",
+##                                 "Jennifer Sirota [ctb]")
 
 
 ## ------------------------------------------------------------------------
-pubDate <- "2012" 
-# title <- "Thresholds and Tipping Points in a Sarracenia 
-#           Microecosystem at Harvard Forest since 2012"
+pubDate <- "2012"
 
 
 ## ----eval=FALSE----------------------------------------------------------
@@ -142,25 +160,25 @@ pubDate <- "2012"
 
 ## ------------------------------------------------------------------------
 keys <- eml_keyword(list(
- "LTER controlled vocabulary" = c("bacteria", 
-                                  "carnivorous plants", 
-                                  "genetics", 
+ "LTER controlled vocabulary" = c("bacteria",
+                                  "carnivorous plants",
+                                  "genetics",
                                   "thresholds"),
-             "LTER core area" = c("populations", 
-                                  "inorganic nutrients", 
+             "LTER core area" = c("populations",
+                                  "inorganic nutrients",
                                   "disturbance"),
-                "HFR default" = c("Harvard Forest", 
-                                  "HFR", 
-                                  "LTER", 
+                "HFR default" = c("Harvard Forest",
+                                  "HFR",
+                                  "LTER",
                                   "USA")))
 
 
 ## ------------------------------------------------------------------------
 coverage <- eml_coverage(
-  scientific_names = "Sarracenia purpurea", 
+  scientific_names = "Sarracenia purpurea",
   dates            = c('2012-06-01', '2013-12-31'),
-  geographic_description = "Harvard Forest Greenhouse, 
-                            Tom Swamp Tract (Harvard Forest)", 
+  geographic_description = "Harvard Forest Greenhouse,
+                            Tom Swamp Tract (Harvard Forest)",
   NSEWbox          = c( 42.55,  42.42, -72.1, -72.29, 160, 330))
 
 
@@ -179,7 +197,7 @@ abstract <- "The primary goal of this project is to determine
   state changes and may give early warning before increasing variances
   and statistical flickering of monitored variables; and (2) well-timed
   intervention based on proteomic biomarkers can avert future state changes
-  in ecological systems."  
+  in ecological systems."
 
 
 ## ------------------------------------------------------------------------
@@ -198,8 +216,8 @@ library(XML)
 f2 <- wordDoc(system.file("examples", "methods.docx", package="EML"))
 doc <- f2[[getDocument(f2)]]
 txt <- xpathSApply(doc, "//w:t", xmlValue)
-## FIXME add <title> <section> and <para> blocking back: 
-method <- paste(txt, collapse = "\n\n") 
+## FIXME add <title> <section> and <para> blocking back:
+method <- paste(txt, collapse = "\n\n")
 
 
 ## ------------------------------------------------------------------------
@@ -212,7 +230,7 @@ additionalMetadata <- hf205@additionalMetadata # extracted from previous eml fil
 
 
 ## ------------------------------------------------------------------------
-dataset <- new("dataset", 
+dataset <- new("dataset",
                 title = title,
                 creator = creator,
                 contact = contact,
@@ -258,5 +276,3 @@ eml_write(eml, file="hf205_from_EML.xml")
 
 ## ------------------------------------------------------------------------
 eml_validate("hf205_from_EML.xml")
-
-
