@@ -113,7 +113,7 @@ contact@phone = "000-000-0000"
 
 
 ## ------------------------------------------------------------------------
-creator <- c(as("Aaron Ellison", "creator"), as("Nicholas Gotelli", "creator"))
+# creator <- c(as("Aaron Ellison", "creator"), as("Nicholas Gotelli", "creator"))
 
 
 ## ------------------------------------------------------------------------
@@ -123,8 +123,8 @@ other_researchers <- eml_person("Benjamin Baiser [ctb]",
 
 ## ------------------------------------------------------------------------
 pubDate <- "2012" 
-title <- "Thresholds and Tipping Points in a Sarracenia 
-          Microecosystem at Harvard Forest since 2012"
+# title <- "Thresholds and Tipping Points in a Sarracenia 
+#           Microecosystem at Harvard Forest since 2012"
 
 
 ## ----eval=FALSE----------------------------------------------------------
