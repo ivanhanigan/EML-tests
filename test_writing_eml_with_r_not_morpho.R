@@ -15,7 +15,7 @@ opts_chunk$set(fig.path = paste("figure/",
 
 ## ------------------------------------------------------------------------
 library(EML)
-
+library(disentangle)
 
 ## ------------------------------------------------------------------------
 f <- eml_read("knb-lter-hfr.205.4")
@@ -24,6 +24,14 @@ str(dat)
 head(dat)
 tail(dat)
 # year and day look like full dates.
+summary(dat$year)
+dat$year <- as.Date(dat$year)
+dat$day <- as.Date(dat$day)
+dat$hour.min <- as.character(dat$hour.min)
+# and valu is number
+dat$value.i <- as.numeric(as.character(dat$value.i))
+dd <- data_dictionary(dat, show_levels = 10)
+dd
 
 
 ## ------------------------------------------------------------------------
@@ -34,7 +42,6 @@ col.defs <- c("run.num" = "which run number (=block). Range: 1 - 6. (integer)",
               "i.flag" =  "is variable Real, Interpolated or Bad (character/factor)",
               "variable" = "what variable being measured in what treatment (character/factor).",
               "value.i" = "value of measured variable for run.num on year/day/hour.min.")
-
 
 ## ------------------------------------------------------------------------
 unit.defs = list("which run number", 
@@ -50,14 +57,7 @@ unit.defs = list("which run number",
                    air.temp = "air temperature measured just above all plants (1 thermocouple)",
                    water.temp = "water temperature measured within each pitcher",
                    par = "photosynthetic active radiation (PAR) measured just above all plants (1 sensor)"),
-                 c(control = "% dissolved oxygen",
-                   low = "% dissolved oxygen",
-                   med.low = "% dissolved oxygen",
-                   med.high = "% dissolved oxygen",
-                   high  = "% dissolved oxygen",
-                   air.temp = "degrees C",
-                   water.temp = "degrees C",
-                   par = "micromoles m-1 s-1"))
+                 "number")
 
 
 ## ------------------------------------------------------------------------
@@ -73,13 +73,19 @@ slotNames(dataTable)
 slotNames(dataTable@physical)
 dataTable@physical@objectName
 slotNames(dataTable@physical@distribution)
-dataTable@physical@distribution@online@url <- "ecogrid"
+morpho_dir <- "~/.morpho/profiles//hanigan/data//hanigan"
+morpholist<-dir(morpho_dir)
+n <- floor(max(na.omit(as.numeric(morpholist))))
+n
+dataTable@physical@distribution@online@url <- sprintf("ecogrid://knb/hanigan.%s",n+2.1)
 dataTable@physical@distribution@online@url
 str(dataTable)
 eml_config(creator="Carl Boettiger <cboettig@gmail.com>")
-eml_write(dataTable, file = "EML_example2.xml")
-
-
+eml_write(dataTable, file = "EML_example2.xml", title = "This is an example from the package vignette.")
+eml1 <- eml_read("EML_example2.xml")
+slotNames(eml1)
+slotNames(eml1@dataset@distribution@online)
+eml1@dataset@distribution@online
 ## ------------------------------------------------------------------------
 HF_address <- new("address", 
                   deliveryPoint = "324 North Main Street",
