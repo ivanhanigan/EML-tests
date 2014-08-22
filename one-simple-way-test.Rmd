@@ -26,7 +26,7 @@ widespread adoption of scripting languages such as R among students of
 Ecology and Evolution have all reduced barriers to sharing and reusing
 data efficiently and effectively.
 
-Here we introduce the `EML` package for the R statistical environment, 
+Here we introduce the `EML` package for the R statistical environment,
 as one simple way to accomplish these nine elements and much more besides.
 
 
@@ -38,8 +38,8 @@ These developments, together with new semantic technologies currently on
 the horizon, and the billons of dollars invested in enormous monitoring
 and data collection efforts such as the National Ecological Observatory
 Network, the Ocean Observatory Intiative, and similar efforts offer
-unpresidented opportunities to tackle the rich, integrative and data-intensive 
-questions that challenge our globe today.  
+unpresidented opportunities to tackle the rich, integrative and data-intensive
+questions that challenge our globe today.
 -->
 
 
@@ -70,7 +70,7 @@ xtable::xtable(dat)
 ```
 
 
-In case our column header abbreviations are not obvious to others (or our future selves), we take a moment to define them: 
+In case our column header abbreviations are not obvious to others (or our future selves), we take a moment to define them:
 
 ```{r}
 col_metadata = c(river = "http://dbpedia.org/ontology/River",
@@ -84,28 +84,33 @@ Define the units used in each column.  In the case of factors, we define
 the abbreviations in a named string.
 
 ```{r}
-unit_metadata = 
+unit_metadata =
   list(river = c(SAC = "The Sacramento River", AM = "The American River"),
        spp = c(king = "King Salmon", ccho = "Coho Salmon"),
        stg = c(parr = "third life stage", smolt = "fourth life stage"),
        ct = "number")
 
 # automated?
-dat <- dat[,-4]
+#dat <- dat[,-4]
 dat
 #get_vals()
 str <- list()
 for(i in 1:ncol(dat)){
-#i = 1
-x <- dat[,i]
-vals <-  names(table(x))
-v <- names(dat)[i]  
-#v
-str[[i]] <- paste(
-v, ' = c(',
-paste(vals, sep = '', collapse = ' = "TBA",')
-,' = "TBA")', sep = '')
-}
+  #i = 1
+  if(is.numeric(dat[,i])){
+    v <- names(dat)[i]
+    str[[i]] <- paste(v,' = "number"',sep='')
+  } else {
+    x <- dat[,i]
+    vals <-  names(table(x))
+    v <- names(dat)[i]
+    #v
+    str[[i]] <- paste(
+    v, ' = c(',
+    paste(vals, sep = '', collapse = ' = "TBA",')
+    ,' = "TBA")', sep = '')
+    }
+  }
 str
 str2 <- ""
 for(n in 1:(length(str)-1)){
@@ -114,7 +119,7 @@ for(n in 1:(length(str)-1)){
   str2 <- paste(str2, str[[length(str)]], "\n")
 cat(str2)
 str3 <- paste("
-unit_metadata = 
+unit_metadata =
   list(",str2,")", sep = "")
 cat(str3)
 eval(parse(text = str3))
@@ -135,9 +140,9 @@ a title, and even choose where to publish:
 
 ```{r}
 eml1 <- eml_write(dat_with_metadata,
-          contact = "Carl Boettiger <cboettig@ropensci.org>",  
-          title = "A test EML file", 
-          file = "test1.xml")
+          contact = "Carl Boettiger <cboettig@ropensci.org>",
+          title = "A test EML file",
+          file = "test1_with_hotwire.xml")
 ```
 
 Just like that, we have accomplished all nine steps, and more besides.
@@ -153,7 +158,7 @@ to take advantage of this metadata when (re)using this data in the future.
 If we had used just the original `data.frame` as the first argument, the
 function would prompt us for the appropriate unit and column metadata. If
 no destination is given, a filename can be provided instead.
- 
+
 We can provide much richer annotation than this example includes.
 We can also store information such as the contact name and address
 in a configuration option to avoid having to provide it repeatedly.
@@ -179,7 +184,7 @@ We provide `n` lines of metadata in the EML file, one of the "metadata
 standards" mentioned by White et al.  This includes basic information
 like the title, author(s), and contact address.
 
-> 1) the what, when, where, and how of data collection, 
+> 1) the what, when, where, and how of data collection,
 
 Methods sections in the file provide answers to these questions.
 Though our minimal example does not describe the collection itself, note
@@ -187,20 +192,20 @@ that we nonetheless have generated a `methods` node, which describes
 the software that created the metadata file (after all, this is a step
 in the analysis).
 
-> 2) how to find and access the data, 
+> 2) how to find and access the data,
 
 Our example returns a DOI and access URLs for the files in the data set:
 
 Rich access options are possible depending on the publication outlet,
 including specifying what users or groups have access to the data.
 
-> 3) suggestions on the suitability of the data for answering specific questions, 
+> 3) suggestions on the suitability of the data for answering specific questions,
 
 We can see at a glance what taxa are covered by the data.  More detailed
 description can be provided in an abstract.
 
 > 4) warnings about known problems or inconsistencies in the data,
- and 
+ and
 > 5) information to check that the data are properly imported, such
 as the number of rows and columns in the dataset and the total sum of
 numerical columns
@@ -214,9 +219,9 @@ are performed in reading in the data into R.
 The second file provides the unprocessed data as a `.csv` file.
 Because `csv` file formats can vary in the details of data orientation,
 delimeters, and so forth, this information should also be provided as metadata
-to ensure reliable and machine-readable intepretation.  The metadata generated 
+to ensure reliable and machine-readable intepretation.  The metadata generated
 using the EML package automatically adds this information based on R's handling
-of csv files: 
+of csv files:
 
 ```xml
 <objectName>data.csv</objectName>
@@ -269,18 +274,18 @@ values, rows, etc:
 Data tables are easiest to manipulate and combine when users consistently
 enter variables as columns and observations as rows (sometimes called "long" format).  Partly because this format
 may require duplicated entries, such as repeating the value of the "site" when
-multiple observations have been made on the same site, many researchers are 
-still tempted to present data in "wide" format, with observations for a single 
+multiple observations have been made on the same site, many researchers are
+still tempted to present data in "wide" format, with observations for a single
 site added as additional rows.  While potentially convenient for field entry,
-the long format is more desirable for most future analysis or reuse.  
+the long format is more desirable for most future analysis or reuse.
 
 The EML package addresses this by both working in the R an environment where
 it is easy and routine to transform between "long" and "wide" formats, while
 also giving the user the flexibility to simply document the data in whatever
-format they feel works best for their analysis.  
+format they feel works best for their analysis.
 
 
-- Standard cell formats 
+- Standard cell formats
 
 White _et al._ recommend that all users learn and adopt certain standard
 formats for representing data, such as the ISO8601 standard for dates
@@ -291,7 +296,7 @@ Like most computer programs, R does not assume that any such pattern
 is a date in ISO8601 format, but rather uses a Date type that permits
 a variety of printing options.  Similarly, the `EML` package relies on
 the metadata to state which cells contain dates and in what format those
-dates are rendered.  
+dates are rendered.
 
 Likewise, the package detects the appropriate metadata based on the
 R representation (such as factor, ordered factor, numeric, integer,
@@ -301,8 +306,8 @@ character, or Date), and writes the appropriate metadata for this format.
 
 ## 5. Good null values
 
-R has good null values in its use of `data.frames`, and permits 
-the user to identify other values for null or missing data.  
+R has good null values in its use of `data.frames`, and permits
+the user to identify other values for null or missing data.
 
 Better yet, we write out our choice of null value in the metadata.
 
@@ -311,20 +316,20 @@ Reading in the data, we can explicitly pass this to `read.csv` rather than
 just assume the null value is appropriate.  This is handled automatically
 by `eml_read`.
 
-## 6. Make it easy to combine 
+## 6. Make it easy to combine
 
 As White _et al._ discuss, providing the kind of detailed column and unit
 metadata we have already discussed, as well as the standard formats addressed
-above, already make data easy to combine.  
+above, already make data easy to combine.
 
 The EML package lets the user go beyond this in being able to automate
 the combining of datasets based on the metadata alone. The key to this process
-is to replace a typical programmatic script for subsetting or combining data sets 
-which is based on implicit knowledge of the data structure (e.g. "select value from column 5 whenever column 2 has value = AAA") into one that is based only 
-on the metadata description: (e.g. "select the species_population_counts from the Sacramento_River site").  The latter has the advantage of not only 
-being easier to interpret, but can also be independent of how the data is structured.  
+is to replace a typical programmatic script for subsetting or combining data sets
+which is based on implicit knowledge of the data structure (e.g. "select value from column 5 whenever column 2 has value = AAA") into one that is based only
+on the metadata description: (e.g. "select the species_population_counts from the Sacramento_River site").  The latter has the advantage of not only
+being easier to interpret, but can also be independent of how the data is structured.
 
-This is already possible with R, but requires explicit use of the column name.  
+This is already possible with R, but requires explicit use of the column name.
 As the column name may already have a specific value given to it by the researcher
 that serves some other purpose, it would be against the objectives of EML to insist that it have a specific name (e.g. all columns containing species names must be called "spp", which among other issues would break some code requiring that
 the column instead be called "species".)  To avoid renaming the columns, we simply
@@ -339,7 +344,7 @@ need to use a consistent description of the column in the metadata instead.
 
 We have quality control on the metadata as well as the data.  While user
 mistakes are still possible, automated validation of the metadata are
-provided reduce the chance of errors.   
+provided reduce the chance of errors.
 
 The `EML` package can perform three levels of validation on EML files
 written from or read into R: validating the XML, validating against the
@@ -354,8 +359,8 @@ eml_validate("example.xml")
 
 The `eml_validate` function is also run automatically any time a
 user attempts to publish data to an external respository. MD5 checksums
-of the data are also computed at this time to ensure that only complete 
-and uncorrupted data is tranfered over the connection.  
+of the data are also computed at this time to ensure that only complete
+and uncorrupted data is tranfered over the connection.
 
 Several mechanisms are in place to evaluate the quality of the `EML`
 package functions themselves.  In addition to the examples from the
@@ -363,7 +368,7 @@ documentation and the automated package checks provided for the R system,
 the `EML` package includes a complete test suite using the testthat
 package [Wickham 2011].  This helps ensures that the software works
 as expected and maintains consistent behavior in any future versions
-of the software package.  
+of the software package.
 
 [Wickham 2011]: http://vita.had.co.nz/papers/testthat.html
 
@@ -400,7 +405,7 @@ have been set up.
 
 ```r
 eml_publish(eml, permanent = TRUE, identifier = "doi", destination="knb")
-``` 
+```
 
 The KNB provides several different kinds of identifiers, including
 `uuid` and `doi`. A DOI (`doi`) should only be requested for finished,
@@ -435,7 +440,7 @@ function call:
 
 ```{r}
 eml_write(dat_with_metadata,
-          contact = "Carl Boettiger <cboettig@ropensci.org>",  
+          contact = "Carl Boettiger <cboettig@ropensci.org>",
           title = "A test EML file",
           intellectualRights = "Name of an extablished license or
           copyright declaration, Text string describing the rights to
@@ -449,4 +454,4 @@ eml_write(dat_with_metadata,
 
 
 
-[^1]: Disclaimer: CB served as a reviewer and KR as handling editor for White et al. 
+[^1]: Disclaimer: CB served as a reviewer and KR as handling editor for White et al.
