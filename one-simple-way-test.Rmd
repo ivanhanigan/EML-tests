@@ -89,6 +89,36 @@ unit_metadata =
        spp = c(king = "King Salmon", ccho = "Coho Salmon"),
        stg = c(parr = "third life stage", smolt = "fourth life stage"),
        ct = "number")
+
+# automated?
+dat <- dat[,-4]
+dat
+#get_vals()
+str <- list()
+for(i in 1:ncol(dat)){
+#i = 1
+x <- dat[,i]
+vals <-  names(table(x))
+v <- names(dat)[i]  
+#v
+str[[i]] <- paste(
+v, ' = c(',
+paste(vals, sep = '', collapse = ' = "TBA",')
+,' = "TBA")', sep = '')
+}
+str
+str2 <- ""
+for(n in 1:(length(str)-1)){
+  str2 <- paste(str2, str[[n]], ",\n")
+}
+  str2 <- paste(str2, str[[length(str)]], "\n")
+cat(str2)
+str3 <- paste("
+unit_metadata = 
+  list(",str2,")", sep = "")
+cat(str3)
+eval(parse(text = str3))
+unit_metadata
 ```
 
 
