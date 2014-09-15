@@ -321,3 +321,40 @@ eml_write(eml, file="hf205_from_EML.xml")
 eml_validate("hf205_from_EML.xml")
 
 #+end_src
+* reading emls to find out about data
+*** COMMENT eml_read-code
+#+name:eml_read
+#+begin_src R :session *R* :tangle no :exports none :eval no
+  #### name:eml_read####
+  library(EML)
+  library(XML)
+  flist <- dir("~/.morpho/profiles/ltern2/data/ltern2")
+  flist
+  
+  for(f in flist){
+     f <- flist[49]
+     print(f)
+    # is it csv?
+    try(dat <- read.delim(f))
+    if(
+      length(
+        grep("xml.version.1.0", names(dat)[1]) == 0
+        ) == 0
+      ) next
+    
+    eml <- eml_read(f)
+    #slotNames(eml)
+    #atrb <- eml_get(eml, "attributeList")
+    #atrb
+    #  eml@dataset@dataTable@.Data[[1]]@attributeList
+    cit <- eml_get(eml, "citation_info")
+    print(cit)
+    #eml@dataset@title
+    #slotNames(eml@dataset@dataTable@.Data[[1]])
+    #eml_get(eml, "data.set")
+    eml_get( eml, "csv_filepaths")
+    eml@dataset@distribution
+    eml@dataset@distribution@online
+  #   xmlValue(f@additionalMetadata@.Data[[1]]@metadata[[1]][1]$url)
+  }
+#+end_src

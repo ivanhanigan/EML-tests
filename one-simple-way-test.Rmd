@@ -93,17 +93,17 @@ unit_metadata =
 # automated?
 #dat <- dat[,-4]
 dat
-#get_vals()
+get_vals <- function(indat){
 str <- list()
-for(i in 1:ncol(dat)){
+for(i in 1:ncol(indat)){
   #i = 1
-  if(is.numeric(dat[,i])){
-    v <- names(dat)[i]
+  if(is.numeric(indat[,i])){
+    v <- names(indat)[i]
     str[[i]] <- paste(v,' = "number"',sep='')
   } else {
-    x <- dat[,i]
+    x <- indat[,i]
     vals <-  names(table(x))
-    v <- names(dat)[i]
+    v <- names(indat)[i]
     #v
     str[[i]] <- paste(
     v, ' = c(',
@@ -111,19 +111,23 @@ for(i in 1:ncol(dat)){
     ,' = "TBA")', sep = '')
     }
   }
-str
+#str
 str2 <- ""
 for(n in 1:(length(str)-1)){
   str2 <- paste(str2, str[[n]], ",\n")
 }
-  str2 <- paste(str2, str[[length(str)]], "\n")
-cat(str2)
+str2 <- paste(str2, str[[length(str)]], "\n")
+#cat(str2)
 str3 <- paste("
 unit_metadata =
   list(",str2,")", sep = "")
-cat(str3)
+#cat(str3)
 eval(parse(text = str3))
-unit_metadata
+return(unit_metadata)
+}
+
+u1 <- get_vals(dat)
+u1
 ```
 
 
