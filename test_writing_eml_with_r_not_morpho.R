@@ -16,7 +16,7 @@
 
 
 ## ------------------------------------------------------------------------
-## library(EML)
+library(EML)
 ## library(disentangle)
 ## require(gdata)
 ## ## ------------------------------------------------------------------------
@@ -38,6 +38,63 @@
 
 
 
+f <- eml_read("knb-lter-hfr.205.4")
+
+slotNames(f)
+slotNames(f@dataset@distribution@online)
+f@dataset@distribution@online
+
+
+# compared with
+morphodir <- "~/.morpho/profiles/ltern2/data/ltern2"
+flist <- dir(morphodir)
+flist
+#for(f in flist){
+  f <- flist[6]
+  print(f)
+  # is it csv?
+  try(dat <- read.delim(file.path(morphodir,f)))
+  if(
+    length(
+      grep("xml.version.1.0", names(dat)[1]) == 0
+    ) == 0
+  ) next
+  
+  eml <- eml_read(file.path(morphodir,f))
+  #slotNames(eml)
+  atrb <- eml_get(eml, "attributeList")
+str(atrb)
+atrb
+for(i in 1:length(atrb)){
+  print(i)
+  print(length(atrb[[i]]))
+  print(atrb[[i]][3])
+}
+atrb[[4]]
+  #  eml@dataset@dataTable@.Data[[1]]@attributeList
+  cit <- eml_get(eml, "citation_info")
+  print(cit)
+  #eml@dataset@title
+  #slotNames(eml@dataset@dataTable@.Data[[1]])
+  #eml_get(eml, "data.set")
+  #eml_get( eml, "csv_filepaths")
+  eml@dataset@distribution
+  eml@dataset@distribution@online
+  #   xmlValue(f@additionalMetadata@.Data[[1]]@metadata[[1]][1]$url)
+
+require(XML)
+x <- xmlTreeParse(file.path(morphodir,f), useInternal=T)
+top <- xmlRoot(x)
+str(top)
+names(top)
+top [[2]] # prints the whole thing
+names(top[["dataset"]])
+names(top [["dataset"]][["dataTable"]][["physical"]][["distribution"]][["online"]][["url"]])
+top [["dataset"]][["dataTable"]][["physical"]][["distribution"]][["online"]][["url"]]
+
+#}
+
+# onwards
 f <- eml_read("knb-lter-hfr.205.4")
 dat <- eml_get(f, "data.frame")
 str(dat)
