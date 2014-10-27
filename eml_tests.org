@@ -328,11 +328,11 @@ eml_validate("hf205_from_EML.xml")
   #### name:eml_read####
   library(EML)
   library(XML)
-  flist <- dir("~/.morpho/profiles/ltern2/data/ltern2")
+  flist <- dir("~/.morpho/profiles/ltern/data/ltern", full.names=T)
   flist
   
   for(f in flist){
-     f <- flist[49]
+     f <- flist[10]
      print(f)
     # is it csv?
     try(dat <- read.delim(f))
@@ -342,13 +342,23 @@ eml_validate("hf205_from_EML.xml")
         ) == 0
       ) next
     
-    eml <- eml_read(f)
-    #slotNames(eml)
+  
+     eml <- eml_read(f)
+    slotNames(eml)
     #atrb <- eml_get(eml, "attributeList")
     #atrb
     #  eml@dataset@dataTable@.Data[[1]]@attributeList
     cit <- eml_get(eml, "citation_info")
     print(cit)
+  
+    cov <- eml_get(eml, "coverage")
+    str(cov)
+    cov@taxonomicCoverage@taxonomicClassification[[1]]@taxonRankValue
+  n <- length(cov@taxonomicCoverage@taxonomicClassification)
+  for(i in 1:10){ #n){
+  #  i=1
+   print(cov@taxonomicCoverage@taxonomicClassification[[i]]@taxonRankValue)
+   }
     #eml@dataset@title
     #slotNames(eml@dataset@dataTable@.Data[[1]])
     #eml_get(eml, "data.set")
@@ -357,4 +367,5 @@ eml_validate("hf205_from_EML.xml")
     eml@dataset@distribution@online
   #   xmlValue(f@additionalMetadata@.Data[[1]]@metadata[[1]][1]$url)
   }
+  
 #+end_src
