@@ -369,3 +369,193 @@ eml_validate("hf205_from_EML.xml")
   }
   
 #+end_src
+*** COMMENT reml_ltern-code
+#+name:reml_ltern
+#+begin_src R :session *R* :tangle reml_ltern.Rmd :exports none :eval no :padline no
+  ---
+  title: "REML_LTERN"
+  author: "Ivan C Hanigan"
+  date: "11/5/2014"
+  output: html_document
+  ---
+  
+  This is simple example for EML from LTERN and SuperSites data:
+  
+  ```{r}
+  library(EML)
+  # I already know that this is an LTERN dataset, but there is probably a way to ask Metacat for all the possible EML xmls available
+  f <- "http://www.ltern.org.au/knb/metacat/ltern2.240/xml"
+  eml <- eml_read(f)
+  cit <- eml_get(eml, "citation_info")
+  print(cit)
+  cov <- eml_get(eml, "coverage")
+  cov@geographicCoverage
+  n <- length(cov@taxonomicCoverage@taxonomicClassification)
+  for(i in 1:n){
+    taxon_name <- cov@taxonomicCoverage@taxonomicClassification[[i]]@taxonRankValue
+    print(taxon_name)
+    }
+  cov@temporalCoverage
+  eml_get(eml, "csv_filepaths")
+  # note that this is not the actual download link.
+  # further work required to access the correct data download link, 
+  # and then also make the user agree to terms and conditions, and for us to monitor their downloads.
+  
+  sessionInfo()
+  ```
+  
+  
+#+end_src
+*** COMMENT scrape_metacat-code
+#+name:scrape_metacat
+#+begin_src R :session *R* :tangle no :exports none :eval no
+  #### name:scrape_metacat####
+  library(EML)
+  dat_out <- as.data.frame(matrix(NA, ncol = 3, nrow = 0))
+  names(dat_out) <- c("docid", "thesaurus", "keyword")
+  
+  profiles  <- c('ltern2', 'ltern', 'datalibrarian', 'datalibrarian2')
+  for(prof in  profiles){
+    flist <- sprintf("%s.%s",prof, 1:500)
+    #flist[1:10]
+    for(fi in flist){
+      # fi <- flist[8]
+   
+      # is it csv?
+      f <- sprintf('http://www.ltern.org.au/knb/metacat/%s/xml', fi) 
+      try(dat <- read.delim(f))
+      if(
+        length(
+          grep("xml.version.1.0", names(dat)[1]) == 0
+          ) == 0       |
+        length(grep("error", dat[1,]) == 1) != 0
+        ) next
+      print(fi)   
+     
+      try(eml <- eml_read(f))
+      slotNames(eml)
+      cit <- eml_get(eml, "citation_info")
+      #print(cit)
+        
+      ky <- eml_get(eml, "keywords")
+      
+      dat <- cbind(fi, row.names(as.matrix(unlist(ky), ncol = 1)), as.data.frame(as.matrix(unlist(ky), ncol = 1), row.names = F))
+      names(dat) <- c("docid", "thesaurus", "keyword")
+      #dat
+      dat_out <- rbind(dat_out, dat)
+      #atrb <- eml_get(eml, "attributeList")
+      #atrb
+      #  eml@dataset@dataTable@.Data[[1]]@attributeList
+    #  cov <- eml_get(eml, "coverage")
+     
+    #  n <- length(cov@taxonomicCoverage@taxonomicClassification)
+    #  for(i in 1:n){
+    #    taxon_name <- cov@taxonomicCoverage@taxonomicClassification[[i]]@taxonRankValue
+    #    print(taxon_name)
+    #    }
+    #  print(cov@temporalCoverage)
+    #  print(cov@geographicCoverage)
+    #  slts <- slotNames(cov@geographicCoverage@boundingCoordinates)  
+    #  for(s in slts){print(slot(cov@geographicCoverage@boundingCoordinates, s))}
+    #  eml_get(eml, "csv_filepaths")   
+     }
+  }
+  
+  str(dat_out)
+  head(dat_out)
+  tail(dat_out)
+  write.csv(dat_out, "keywords_20141117.csv", row.names = F)
+#+end_src
+*** COMMENT list_records-code
+#+name:list_records
+#+begin_src R :session *R* :tangle no :exports none :eval no
+#### name:list_records####
+# http://www.informit.com/articles/article.aspx?p=2215520
+require(XML)
+lnk <- "http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&metadataPrefix=eml-2.1.0"
+# or 
+#lnk <- c("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&metadataPrefix=oai_dc")
+xmlfile=xmlParse(lnk)
+xmltop = xmlRoot(xmlfile) #gives content of root
+# class(xmltop)#"XMLInternalElementNode" "XMLInternalNode" "XMLAbstractNode"
+# xmlName(xmltop) #give name of node, PubmedArticleSet
+# xmlSize(xmltop) #how many children in node
+# xmlName(xmltop[[1]]) #name of root's children
+# # have a look at the content of the first child entry
+# xmltop[[1]]
+# # have a look at the content of the 2nd child entry
+ xmltop[[2]]
+ xmltop[[3]]
+# #Root Node's children
+n <- xmlSize(xmltop[[3]]) #number of nodes in each child
+n
+# xmlSApply(xmltop[[3]], xmlName) #name(s)
+# xmlSApply(xmltop[[3]], xmlAttrs) #attribute(s)
+# xmlSApply(xmltop[[3]], xmlSize) #size
+
+names(xmltop[[3]][[1]][["metadata"]][["eml"]][["dataset"]])
+for(i in 1:(n-1)){
+  print(xmltop[[3]][[i]][["metadata"]][["eml"]][["dataset"]][["title"]])  
+}
+
+
+# REFERENCE http://www.informit.com/articles/article.aspx?p=2215520
+require(XML)
+lnk <- c("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&metadataPrefix=eml-2.1.0")
+xmlfile=xmlParse(lnk)
+xmltop = xmlRoot(xmlfile) #gives content of root
+n <- xmlSize(xmltop[[3]]) #number of nodes in each child
+#n
+names(xmltop[[3]][[1]][["metadata"]][["eml"]][["dataset"]])
+
+
+
+
+
+# as this is a partial list we will have to start by just getting one list and it's token
+lnk <- c("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&metadataPrefix=eml-2.1.0")
+xmlfile=xmlParse(lnk)
+xmltop = xmlRoot(xmlfile)
+for(i in 1:(n)){
+#  i = 6
+  if(i != n){
+    print(xmltop[[3]][[i]][["metadata"]][["eml"]][["dataset"]][["title"]])
+  } else {
+    token <- xmlValue(xmltop[[3]][[i]])
+  }
+}
+# and then we iterate over the partial lists until completed
+for(j in 1:100){
+  #j = 1
+  if(!exists("old_token")) old_token <- ""
+  if(old_token == token) break
+  #print(token)
+  lnk <- paste("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&resumptionToken=",token, sep ="")
+  xmlfile=xmlParse(lnk)
+  xmltop = xmlRoot(xmlfile)
+  for(i in 1:(n)){
+    #i = 6
+    if(i != n){
+      print(xmltop[[3]][[i]][["metadata"]][["eml"]][["dataset"]][["title"]])
+    } else {
+      old_token <- token
+      token <- xmlValue(xmltop[[3]][[i]])
+    }
+  }
+}
+rm(old_token)
+# workings
+lnk <- paste("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&resumptionToken=",token, sep ="")
+lnk
+xmlfile=xmlParse(lnk)
+xmltop = xmlRoot(xmlfile) #gives content of root
+n <- xmlSize(xmltop[[3]]) 
+n
+i = 1
+print(xmltop[[3]][[i]][["metadata"]][["eml"]][["dataset"]][["title"]])
+
+# dublin core
+lnks <- c("http://www.ltern.org.au/knb/dataProvider?verb=ListRecords&metadataPrefix=oai_dc",
+          "http://www.ltern.org.au/knb/dataProvider?verb=ListIdentifiers&metadataPrefix=oai_dc")
+
+#+end_src
